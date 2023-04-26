@@ -1,0 +1,30 @@
+---
+title: "homework9"
+author: "Shangsi Lin"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+library(survival)
+library(ggfortify)
+library(KMsurv)
+```
+
+```{r question_c}
+data("tongue")
+tongue_df = tongue %>% 
+  mutate(type = ifelse(type == 1, "aneuploidy", "diploid"))
+km = survfit(Surv(time, delta) ~ type, data = tongue_df, conf.type = 'log')
+plot(km, conf.int = TRUE, mark.time = TRUE, xlab = "time in week", ylab = "S(t)", main = "Kaplan-Meier curve of survival function")
+autoplot(km)
+one_year = summary(km, time = 365 / 7) 
+response = cbind(one_year$surv, one_year$lower, one_year$upper)
+rownames(response) = c("aneuploidy", "diploid")
+colnames(response) = c("estimate", "lower 95% CI", "upper 95% CI")
+response
+```
+
